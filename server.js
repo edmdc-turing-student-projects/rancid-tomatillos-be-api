@@ -8,24 +8,26 @@ app.use(express.json());
 app.locals.title="Rancid Tomatillos API";
 app.locals.comments = [
   {
-    id: 1, 
-    author: 'Aang', 
+    id: 1,
+    author: 'Aang',
     comment: 'Great movie!',
     movie_id: 508439
   },
   {
-    id: 2, 
-    author: 'Katara', 
+    id: 2,
+    author: 'Katara',
     comment: 'Not good. They need to quit making these movies',
     movie_id: 522938
   },
   {
-    id: 3, 
-    author: 'Zuko', 
+    id: 3,
+    author: 'Zuko',
     comment: 'Always a classic.',
     movie_id: 603
   },
 ]
+
+app.locals.favorites = [];
 
 app.set('port', process.env.PORT || 3001);
 
@@ -43,7 +45,7 @@ app.post('/api/v1/movies/comments', (request, response) => {
       return response
         .status(422)
         .json({error: `You are missing a required paramter of ${requiredParameter}. Expected format: { author: <String>, comment: <String>, movie_id: <Integer> }`});
-    } 
+    }
   }
   const {author, comment, movie_id} = comments
   app.locals.comments.push({id, author, comment, movie_id})
@@ -58,7 +60,8 @@ app.get('/api/v1/rancid-tomatillos', (request, response) => {
 //   response.send
 // });
 
-app.post('api/vi/rancid-tomatillos/favorites', (request, response) => {
+app.post('api/vi/rancid-tomatillos/movies/favorites', (request, response) => {
+   
 })
 
 app.listen(app.get('port'), () => {
