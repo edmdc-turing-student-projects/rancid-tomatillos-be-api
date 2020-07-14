@@ -33,6 +33,14 @@ app.locals.favorites = [
     id:37,
     movieId: 522938,
     userId: 58
+  }, {
+    id: 88,
+    movieId: 603,
+    userId: 58
+  }, {
+    id: 79,
+    movieId: 689,
+    userId: 58
   }
 ];
 
@@ -91,13 +99,15 @@ app.post('/api/v1/movies/favorites', (request, response) => {
   return response.status(201).json("Movie added to favorites")
 })
 
-app.delete('/api/v1/movies/favorites', (request, response) => {
+app.patch('/api/v1/movies/favorites', (request, response) => {
   const {movieId, userId} = request.body;
-  const foundMovie = app.locals.favorites.findIndex(favorite => {
+  const foundMovieIndex = app.locals.favorites.findIndex(favorite => {
     return (favorite.movieId ===  movieId && favorite.userId === userId)
   })
 
-  console.log(foundMovie)
+  // app.locals.favorites = [...fileteredMovies]
+  app.locals.favorites.splice(foundMovieIndex, 1)
+
 
   return response
     .send("Favorite successfully removed")
