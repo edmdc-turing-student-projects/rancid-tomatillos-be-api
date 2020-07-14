@@ -96,18 +96,31 @@ app.post('/api/v1/movies/favorites', (request, response) => {
 
   const {movieId, userId} = favorite;
   app.locals.favorites.push({id, movieId, userId})
-  return response.status(201).json("Movie added to favorites")
+  return response.status(201).json('Movie added to favorites')
 })
 
 app.patch('/api/v1/movies/favorites', (request, response) => {
-  const {movieId, userId} = request.body;
-  const foundMovieIndex = app.locals.favorites.findIndex(favorite => {
-    return (favorite.movieId ===  movieId && favorite.userId === userId)
-  })
+  const unfavoriteIdea = request.body;
+  for(let requiredParameter of ['movieId', 'userId']) {
+   if(typeof unfavoriteIdea[requiredParameter] !== 'number') {
+     return response
+       .status(422)
+       .json({error: `Tidings from a friendly server. Check the data type of ${requiredParameter}, an <Integer> was expected`})
+   }
+  }
 
-  // app.locals.favorites = [...fileteredMovies]
+  const {movieId, userId} = unfavoriteIdea;
+  const findMovie2Unfavorite = app.locals.favorites.filter(useFavorite => useFavorite.userId === userId)
+    .find(favorite => favorite.movieId ===  movieId)
+
+  if(!findMovie2Unfavorite) {
+    return response
+      .status(422)
+      .json({ error: 'A favorite to unfavorite was not found. No harm done. Check source code for proper value attachments' })
+  }
+
+  const foundMovieIndex = app.locals.favorites.findIndex(unfavorite => unfavorite === findMovie2Unfavorite) 
   app.locals.favorites.splice(foundMovieIndex, 1)
-
 
   return response
     .send("Favorite successfully removed")
