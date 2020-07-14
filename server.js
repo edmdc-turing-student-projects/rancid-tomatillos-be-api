@@ -28,17 +28,32 @@ app.locals.comments = [
   },
 ]
 
-app.locals.favorites = [];
+app.locals.favorites = [
+  {
+    id:37,
+    movieId: 522938,
+    userId: 58
+  }
+];
 
 app.set('port', process.env.PORT || 3001);
+
+app.get('/api/v1/rancid-tomatillos', (request, response) => {
+  response.send("Greetings from the depth of your machines, or perhaps one day the web!")
+});
 
 app.get('/api/v1/movies/comments', (request, response) => {
   const comments = app.locals.comments;
   response.status(200).json({ comments });
 })
 
+app.get('/api/v1/movies/favorites', (request, response) => {
+  const favorites = app.locals.favorites;
+  response.status(200).json({ favorites });
+})
+
 app.post('/api/v1/movies/comments', (request, response) => {
-  const id = Date.now();
+  const id = shortid.generate();
   const comments = request.body;
 
   for (let requiredParameter of ['author', 'comment', 'movie_id']) {
@@ -53,16 +68,39 @@ app.post('/api/v1/movies/comments', (request, response) => {
   return response.status(201).json({id, author, comment, movie_id});
 })
 
-app.get('/api/v1/rancid-tomatillos', (request, response) => {
-  response.send("Greetings from the depth of your machines!")
-});
+app.post('/api/v1/movies/favorites', (request, response) => {
+  const id = shortid.generate();
+  const favorite = request.body;
 
-// app.get('/api/v1/rancid-tomatillos/favorites', () => {
-//   response.send
-// });
+  for(let requiredParameter of ['movieId', 'userId']) {
+    if(!favorite[requiredParameter]) {
+      return response
+        .status(422)
+        .json({error: `Hello there! The server was unable to process your request! Missing a ${requiredParameter} Expected format: { movieId: <Integer>, userId: <Integer>}`});
+    }
 
-app.post('api/vi/rancid-tomatillos/movies/favorites', (request, response) => {
-   
+    if(typeof favorite[requiredParameter] !== "number") {
+      return response
+        .status(422)
+        .json({error: `Greetings fellow Intelligent Being! The server did not find the appropriate data type for ${requiredParameter}. Expected format: { movieId: <Integer>, userId: <Integer>}`});
+    }
+  }
+
+  const {movieId, userId} = favorite;
+  app.locals.favorites.push({id, movieId, userId})
+  return response.status(201).json("Movie added to favorites")
+})
+
+app.delete('/api/v1/movies/favorites', (request, response) => {
+  const {movieId, userId} = request.body;
+  const foundMovie = app.locals.favorites.findIndex(favorite => {
+    return (favorite.movieId ===  movieId && favorite.userId === userId)
+  })
+
+  console.log(foundMovie)
+
+  return response
+    .send("Favorite successfully removed")
 })
 
 app.listen(app.get('port'), () => {
